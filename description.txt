@@ -1,0 +1,12 @@
+NIVEL 1 DE SEGURIDAD Y AUTENTICACION
+Primero creamos login sin encriptar nada, solo creamos usuarios y nos logeamos en una contrase;a almacenada en la mongo db
+
+NIVEL 2
+Agregamos algoritmo de encryptado con paquete npm mongoose-encryption, usa el algoritmo moderno de encriptado AES 
+Aqui ya estaria encryptado y aparentemente seria seguro, pero no es del todo cierto, ya que en app.js tenemos la palabra secreta que usamos as[i como el metodo
+de encriptado]. Alguien con conocimiento puede tomar eso y descifrar las contrase;as. Y mas si publicamos las cosas en github o en algun repositorio compartido
+
+NIVEL3
+Instalamos el npm dotenv e igual vemos la documentacion del paquete npm para implementarlo
+Agregamos tambien el gitignore para que los archivos .env esten ocultos a la hora de subirlos a un repositorio
+Creamos el repositorio git add
