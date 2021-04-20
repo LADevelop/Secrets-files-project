@@ -1,12 +1,47 @@
 NIVEL 1 DE SEGURIDAD Y AUTENTICACION
 Primero creamos login sin encriptar nada, solo creamos usuarios y nos logeamos en una contrase;a almacenada en la mongo db
 
-NIVEL 2
+NIVEL 2 ENCRYPTION
 Agregamos algoritmo de encryptado con paquete npm mongoose-encryption, usa el algoritmo moderno de encriptado AES 
 Aqui ya estaria encryptado y aparentemente seria seguro, pero no es del todo cierto, ya que en app.js tenemos la palabra secreta que usamos as[i como el metodo
 de encriptado]. Alguien con conocimiento puede tomar eso y descifrar las contrase;as. Y mas si publicamos las cosas en github o en algun repositorio compartido
 
-NIVEL3
 Instalamos el npm dotenv e igual vemos la documentacion del paquete npm para implementarlo
 Agregamos tambien el gitignore para que los archivos .env esten ocultos a la hora de subirlos a un repositorio
 Creamos el repositorio git add
+
+NIVEL3 HASHING
+Estas no se pueden decodificar, solo se codifican hacia la base de datos pero de regreso es casi imposible (tardarian muchismo tiempo pero si es posible).
+Instalamos npm i md5
+
+NIVEL4 HASHING & SALTING
+USA EL hash mas el salting(numeros aleatorios que el programa o app genera). Agarra el password convertido a hash, le suma el salt aleatorio(el salt puede ser generador varias veces para incrementar el tiepo de procesamiento y disminuir la posibilidad de hackeo)
+instalamos bcrypt version 3.0.6 segun documentacion npm para la version de node que tenemos que es la 12.19.0
+Se manda la funcion segun la documentacion para almacenar el hash generado apartir de el texto plano de password
+y aplicandosele los salt especificados. Ese hash es el que se almacena en la DB y a la hora de quererte logear se 
+Escribe la funcion segun la documentacion, mandamos el textoplano de password y lo comparamos con el hash encontrado en la base de datos
+Al usar passport se elimina esta forma AL USAR NIVEL 5
+
+
+NIVEL 5 COOKIES AND SESIONS
+Elimina la forma anterior y todas las anteriores
+Las cookies son para almacenar datos en el navegador, datos como id de usuario y patrones de algo especifico, como seria
+un intento de compra en amazon o mercadolibre. Esto tambien se puede ver al iniciar sesion (p ej mercadolibre) en una computadora, no cerrar la sesion
+cerrar el navegador, abrir de nuevo el navegador y qu ya no nos pida iniciar la sesion: Esto se logra porque el navegador
+ya tiene la cookie almacenada de mi id de usuario y al hacer un get request para abrir la pagina de mercadolibre la cookie es enviada al servidor y este
+ya sabe quien soy y me abre la pagina con mi sesion iniciada.
+**USAREMOS la cookie para mantener iniciada la sesion a menos que hagamos logout
+npm i passport passport-local passport-local-mongoose express-session (NOT express-sessions)
+passpor-local-mongoose es lo que se usa para hash-salt
+
+NIVEL 6 Third partty OAuth- Open Authorisation (token based autorization)
+Se pretende dar la opcion de login mediante facebook por ejemplo, entonces nuestra aplicacion haria una solicitud get a fb y fb regresaria un post que nos regrese los datos de sus amigos en fb(nombre y email) para asi poder hacer 
+nuestra aplicacion mas grande invitando a esas personas.
+Basicamente facebook los autentica que sean usuarios de ellos o en otro caso google. y ellos nos regresan la informacion de contacto una vez quehan 
+sido autenticados. (ESTO ES PARA DELEGAR ESA RESPOPNSABILIDAD A ELLOS, YA QUE ELLOS ESTAN A LA VANGUARDIA EN AUTENTICACION)
+
+-----WHY OAuth?----------------
+1.-Puedes especificar que datos especificos necesitas y hacer un request de ellos.
+2.-Puedes solo leer, o leer y escribir a fb por ejemplos.
+3.-El usuario puede revocar el permiso dado a la app, pejemplo vas a fb y revocas el permiso que tenia esta app de conectarse a fb
+4.- 
