@@ -44,4 +44,11 @@ sido autenticados. (ESTO ES PARA DELEGAR ESA RESPOPNSABILIDAD A ELLOS, YA QUE EL
 1.-Puedes especificar que datos especificos necesitas y hacer un request de ellos.
 2.-Puedes solo leer, o leer y escribir a fb por ejemplos.
 3.-El usuario puede revocar el permiso dado a la app, pejemplo vas a fb y revocas el permiso que tenia esta app de conectarse a fb
-4.- 
+
+Nos vamos a logear con google https://passportjs.org/packages/passport-google-oauth20 seguimos los pasos creamos la cuenta de google developer console
+hay que instalar el npm de goog auth 2
+Una vez creada la cuenta continuamos con la documentacion de passport y modificamos creando o declarando el npm de google Auth
+modificamos el schema agregando el plugin y agregango el googleId a almacenar, cambiamos la estrategia de serializacion y deserializacion, agregamos el app.get para los metodos de pedir
+logearse mediante google y el redireccionamiento ruta de google.
+
+
