@@ -10,6 +10,8 @@ const passport=require("passport");//seguridad y autenticacion.
 const passportLocalMongoose=require("passport-local-mongoose");// no se necesita requerir passport-local ya que es dependencia de pass-local-mongoo
 const GoogleStrategy=require("passport-google-oauth2").Strategy;//AUTENTICACION CON GOOGLE, USADA COMO ESTRATEGIA PASSPORT
 const findOrCreate=require("mongoose-findorcreate");
+const FacebookStrategy=require("passport-facebook").Strategy;//autenticacion con facebook, se requiere agregar la api en facebook developer, seguir documentacion
+
 
 //app:Secrets FACEBOOK
 
@@ -49,6 +51,7 @@ const userSchema= new mongoose.Schema({//ahora es un objeto creado de la clase s
     email:String,
     password: String,
     googleId:String,//para que los busque el metodo findorcreate
+    facebookId:String,
     secret:String//Secreto hecho por el usuario
 });
 
@@ -76,7 +79,7 @@ passport.serializeUser(function(user, done) {//a;adido de passport, el anterior 
     done(null, user.id);
   });
   
-  passport.deserializeUser(function(id, done) {
+passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
       done(err, user);
     });
@@ -100,9 +103,6 @@ passport.use(new GoogleStrategy({
 //refreshToken:nos permite tomar los datos por un periodo largo de tiempo
 //profile: ahi vienen los datos como email, id y mas info
 
-
-
-
 app.get("/auth/google",//boton de registrar
   passport.authenticate("google", { scope: ["profile"] }));//Le dice que autentice mediante la estrategia de google, y esa estrategia de google ya la coonfiguramos arriba y es la que tiene los datos de la api client id, secret, rutas etc
 
@@ -113,6 +113,33 @@ app.get("/auth/google/secrets", //aqui va a ser la redireccionada de la api, la 
     res.redirect("/secrets");
   });  
 
+  //Agregado para autenticar con facebook, es necesario agregar al schema facebookID y requerir el modulo npm
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret:process.env.FACEBOOK_APP_SECRET,
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+      console.log(profile);
+      console.log(profile.id);
+    User.findOrCreate({ facebookId: profile.id }, function (err, user) {//el profile.id lo obtenemos de google viene siendo su identificacion en las DB de google
+        return cb(err, user);
+      });
+  }
+));
+
+app.get("/auth/facebook",
+  passport.authenticate("facebook"));
+
+app.get("/auth/facebook/callback",
+  passport.authenticate("facebook", { failureRedirect: "/login" }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect("/secrets");
+  });
+
+
+//hasta aqui
 
 app.get("/secrets",function(req,res){
     //aqui revisamos con la cookie si el usuario ya esta autenticado y logeado
